@@ -19,15 +19,15 @@ const Projects = () => {
       detail:
         " A full-featured dashboard for e-commerce stores with analytics, product management, and order processing",
       img: ticTacToeGameImg,
-      gitUrl: "https://gitlab.com/my-websites4815020/tic-tac-toe-game",
-      url: "",
+      gitUrl: "https://github.com/adityaauchar24/Tic-Tac-Toe-Game",
+      url: "http://localhost:5174/",
     },
     {
       name: "Portfolio Website",
       detail:
         " A full-featured dashboard for e-commerce stores with analytics, product management, and order processing",
       img: protfolioWebsiteImg,
-      gitUrl: "https://github.com/AjayAuchar/protfolio-website-ajay-auchar",
+      gitUrl: "https://github.com/adityaauchar24/Protfolio-website",
       url: "http://localhost:4174/",
     },
     {
