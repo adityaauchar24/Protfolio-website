@@ -6,6 +6,9 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LocationPinIcon from "@mui/icons-material/LocationPin";
 import ToastMess from "../ReusableComponents/ToastMess.tsx";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+
 const Contact = () => {
   const contactInfo = [
     { title: "Email", detail: "adityaauchar40@gmail.com", icon: <EmailIcon /> },
@@ -48,11 +51,11 @@ const Contact = () => {
     }, 8000);
   }, [message]);
 
-  const handleForm = (field, value) => {
+  const handleForm = (field: string, value: string) => {
     setContactForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     if (
       contactForm.fullname &&
       contactForm.email &&
@@ -61,7 +64,7 @@ const Contact = () => {
     ) {
       try {
         const res = await fetch(
-          "https://protfolio-website-ajay-auchar.onrender.com/users",
+          `${API_URL}/users`,
           {
             method: "POST",
             headers: {
@@ -133,7 +136,7 @@ const Contact = () => {
             <Button
               name="Submit"
               className={`${["border-red-900", "bg-red-800", "mt-10"]}`}
-              onClick={(e) => handleSubmit(e)}
+              onClick={(e: any) => handleSubmit(e)}
             />
           </div>
         </div>
