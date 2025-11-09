@@ -1,4 +1,5 @@
 // Load environment variables
+import express from "express";
 require("dotenv").config();
 
 const express = require("express");
@@ -16,10 +17,10 @@ app.use(express.json());
 const user_router = require("./Routes/users");
 app.use("/users", user_router);
 
+
 // Basic routes
-app.get("/", (req, res) => {
-  res.json({ message: "Backend API is running!" });
-});
+app.get("/api/hello", (req, res) =>{ res.json({ msg: "Backend API is running!" });});
+
 
 app.get("/health", (req, res) => {
   res.json({ 
