@@ -1,5 +1,7 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // mongoose.set('strictQuery', true);
 mongoose
@@ -7,5 +9,5 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log(`connection to MongoDB`))
-  .catch((err) => console.log(err));
+  .then(() => console.log(`✅ Connection to MongoDB successful`))
+  .catch((err) => console.log("❌ MongoDB connection error:", err));
