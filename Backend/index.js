@@ -17,7 +17,6 @@ app.use(express.json());
 const user_router = require("./Routes/users");
 app.use("/users", user_router);
 
-
 // Basic routes
 app.get("/api/hello", (req, res) =>{ res.json({ msg: "Backend API is running!" });});
 
