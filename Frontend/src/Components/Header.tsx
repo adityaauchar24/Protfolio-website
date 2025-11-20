@@ -222,7 +222,7 @@ const Header = () => {
             {!isMobile && (
               <span className={`
                 absolute bottom-0 left-1/2 transform -translate-x-1/2
-                h-0.5 bg-gradient-to-r from-red-600 to-red-400
+                h-0.5 bg-linear-to-r from-red-600 to-red-400
                 transition-all duration-300
                 ${isActive ? 'w-3/4' : 'w-0 group-hover:w-3/4'}
               `} 
@@ -278,7 +278,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           
           {/* Logo/Brand Section - Left Side */}
-          <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             <div 
               className="
                 flex items-center space-x-1 sm:space-x-2
@@ -303,7 +303,7 @@ const Header = () => {
             >
               {/* Brand Text */}
               <div className="
-                bg-gradient-to-r from-red-700 via-red-600 to-red-500 
+                bg-linear-to-r from-red-700 via-red-600 to-red-500 
                 bg-clip-text text-transparent 
                 transition-all duration-300 
                 group-hover:scale-105
@@ -322,12 +322,12 @@ const Header = () => {
               className="
                 relative
                 w-1.5 h-1.5 xs:w-2 xs:h-2
-                bg-gradient-to-r from-green-400 to-green-500 
+                bg-linear-to-r from-green-400 to-green-500 
                 rounded-full 
                 shadow-sm
                 hidden xs:block
                 animate-pulse
-                flex-shrink-0
+                shrink-0
               " 
               title="Available for work"
               aria-label="Available for work"
@@ -340,7 +340,7 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu Button - Right Side */}
-          <div className="lg:hidden flex-shrink-0">
+          <div className="lg:hidden shrink-0">
             <button
               className="
                 flex flex-col items-center justify-center
