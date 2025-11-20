@@ -170,15 +170,16 @@ const About = () => {
               </p>
               <p>
                 I specialize in developing modern, interactive user interfaces using 
-                cutting-edge technologies like <strong>React.js, JavaScript (ES6+), 
-                TypeScript, Redux Toolkit</strong>, and popular UI libraries including 
+                cutting-edge technologies like <strong>React.js, Node.js, MongoDB, 
+                TypeScript,</strong>, and popular UI libraries including 
                 <strong> Material UI</strong> and <strong>Tailwind CSS</strong>.
               </p>
               <p>
                 My work focuses on delivering clean, scalable, and maintainable code 
-                that enhances both user experience and system performance. I have 
-                hands-on experience with real-time data communication, efficient 
-                REST API integration, and managing complex application states.
+                that enhances both user experience and system performance.I have 
+                created <strong>Full-stack,International Trade platform during Meta 
+                internship,</strong> hands-on experience with real-time data communication, 
+                efficient REST API integration, and managing complex application states.
               </p>
             </div>
 

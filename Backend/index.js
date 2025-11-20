@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import net from "net";
 import connectDB from "./MongoDB/connection.js";
 import userRoutes from "./Routes/users.js";
 
@@ -12,22 +13,80 @@ dotenv.config();
 // Connect to MongoDB
 connectDB();
 
-const PORT = process.env.PORT || 4000;
+const DEFAULT_PORT = process.env.PORT || 4000;
 
-// Enhanced CORS configuration
+// Function to check if port is available
+const isPortAvailable = (port) => {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    
+    server.listen(port, () => {
+      server.close(() => {
+        resolve(true);
+      });
+    });
+    
+    server.on('error', () => {
+      resolve(false);
+    });
+  });
+};
+
+// Find available port
+const findAvailablePort = async (startPort) => {
+  let port = parseInt(startPort);
+  const maxPort = port + 10;
+  
+  while (port <= maxPort) {
+    const available = await isPortAvailable(port);
+    if (available) {
+      return port;
+    }
+    console.log(`⚠️  Port ${port} is busy, trying next port...`);
+    port++;
+  }
+  
+  throw new Error(`❌ No available ports found between ${startPort} and ${maxPort}`);
+};
+
+// Enhanced CORS configuration - Allow all origins for development
 app.use(cors({
   origin: [
     "http://localhost:3000", 
+    "http://localhost:3001",
+    "http://localhost:3002", 
+    "http://localhost:3003",
+    "http://localhost:3004",
     "http://localhost:5173", 
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:3003",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
-    "http://localhost:5175"
+    "http://localhost:5175",
+    "http://localhost:4173", // Vite preview
+    "http://127.0.0.1:4173"
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+  allowedHeaders: [
+    "Content-Type", 
+    "Authorization", 
+    "X-Requested-With",
+    "Accept",
+    "Origin",
+    "Access-Control-Request-Method",
+    "Access-Control-Request-Headers"
+  ],
+  exposedHeaders: [
+    "Content-Range",
+    "X-Content-Range"
+  ],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -36,6 +95,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use((req, res, next) => {
   console.log(`📨 ${new Date().toISOString()} ${req.method} ${req.path}`, {
     ip: req.ip,
+    origin: req.headers.origin,
     userAgent: req.get('User-Agent')
   });
   next();
@@ -87,7 +147,7 @@ app.get("/api/health", async (req, res) => {
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
       server: {
-        port: PORT,
+        port: process.env.SERVER_PORT || DEFAULT_PORT,
         nodeVersion: process.version,
         platform: process.platform
       },
@@ -231,7 +291,7 @@ app.get("/", (req, res) => {
       documentation: "Check /api/health for all endpoints"
     },
     instructions: {
-      frontend: "Set VITE_API_URL to http://localhost:4000",
+      frontend: `Set VITE_API_URL to http://localhost:${process.env.SERVER_PORT || DEFAULT_PORT}`,
       test: "Run node test-db.js to test database connection"
     }
   });
@@ -288,32 +348,41 @@ mongoose.connection.on('disconnected', () => {
   console.log('⚠️ Mongoose disconnected from MongoDB');
 });
 
-// Start server with error handling
+// Start server with auto port detection
 const startServer = async () => {
   try {
-    app.listen(PORT, () => {
-      console.log(`\n🚀 Server running on port ${PORT}`);
-      console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
-      console.log(`👥 Users API: http://localhost:${PORT}/users`);
-      console.log(`📧 Contact form: http://localhost:${PORT}/api/contact`);
-      console.log(`🧪 Test endpoint: http://localhost:${PORT}/api/test`);
-      console.log(`🌐 Frontend should connect to: http://localhost:${PORT}`);
-      console.log(`💾 Database: ${process.env.MONGO_URI ? 'MongoDB Atlas Configured' : 'Not configured'}`);
+    const availablePort = await findAvailablePort(DEFAULT_PORT);
+    
+    // Store the actual port being used
+    process.env.SERVER_PORT = availablePort.toString();
+    
+    app.listen(availablePort, () => {
+      console.log(`\n🎉 SUCCESS: Server started successfully!`);
+      console.log(`🚀 Server running on port ${availablePort}`);
+      console.log(`📍 Health check: http://localhost:${availablePort}/api/health`);
+      console.log(`👥 Users API: http://localhost:${availablePort}/users`);
+      console.log(`📧 Contact form: http://localhost:${availablePort}/api/contact`);
+      console.log(`🧪 Test endpoint: http://localhost:${availablePort}/api/test`);
+      console.log(`🌐 Frontend should connect to: http://localhost:${availablePort}`);
+      console.log(`💾 Database: ${mongoose.connection.readyState === 1 ? 'Connected ✅' : 'Disconnected ❌'}`);
       console.log(`⏰ Server started at: ${new Date().toISOString()}`);
+      
+      if (availablePort !== parseInt(DEFAULT_PORT)) {
+        console.log(`\n💡 IMPORTANT: Port ${DEFAULT_PORT} was busy, using port ${availablePort} instead`);
+        console.log(`   Update your frontend .env file:`);
+        console.log(`   VITE_API_URL=http://localhost:${availablePort}`);
+      }
+      
       console.log(`=========================================`);
     });
   } catch (error) {
-    if (error.code === 'EADDRINUSE') {
-      console.log(`❌ Port ${PORT} is already in use.`);
-      console.log('💡 Please try one of these solutions:');
-      console.log('   1. Kill the process using port 4000:');
-      console.log('      netstat -ano | findstr :4000');
-      console.log('      taskkill /PID <PID> /F');
-      console.log('   2. Change PORT in .env file to 4001');
-      console.log('   3. Wait a few minutes and try again');
-    } else {
-      console.error('❌ Failed to start server:', error.message);
-    }
+    console.error('❌ Failed to start server:', error.message);
+    console.log('\n💡 Please try one of these solutions:');
+    console.log('   1. Kill processes using ports 4000-4010:');
+    console.log('      netstat -ano | findstr :4000');
+    console.log('      taskkill /PID <PID> /F');
+    console.log('   2. Change PORT in .env file to 5001');
+    console.log('   3. Wait a few minutes and try again');
     process.exit(1);
   }
 };
